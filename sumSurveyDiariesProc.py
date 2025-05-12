@@ -7,7 +7,7 @@ from tqdm import tqdm
 import numpy as np
 
 root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData"
-GoogleMapKey = "AIzaSyBDuxcGWitsok_6yhXfj1aY3sI4ON0Fnh0"
+GoogleMapKey = ""
 
 gmaps = googlemaps.Client(key=GoogleMapKey)
 
