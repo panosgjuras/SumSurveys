@@ -7,9 +7,9 @@ from tqdm import tqdm
 import numpy as np
 
 root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData"
-GoogleMapKey = ""
+# GoogleMapKey = ""
 
-gmaps = googlemaps.Client(key=GoogleMapKey)
+# gmaps = googlemaps.Client(key=GoogleMapKey)
 
 location_points = pd.read_csv(os.path.join(root_dir, "finalDatasets", "locPointsUpd.csv"))
 

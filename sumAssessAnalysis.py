@@ -79,7 +79,7 @@ def acceptHist(df, city):
     plt.show()
 
 
-def satisfyHist2(df, city):
+def satisfyHist(df, city):
     relevant_data = df[['city', 'satisfy']].dropna()
     city_data = relevant_data[relevant_data['city'] == city]['satisfy']
     plt.figure(figsize=(10, 6))
@@ -98,19 +98,6 @@ def satisfyHist2(df, city):
     plt.xticks([1, 2, 3, 4, 5, 6])
     plt.show()    
     
-def satisfyHist(df, city):
-    relevant_data = df[['city', 'satisfy']].dropna()
-    city_data = relevant_data[relevant_data['city'] == city]['satisfy']
-    plt.figure(figsize=(10, 6))
-    n, bins, patches = plt.hist(city_data, bins=[0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5], 
-                                color='#75BDFB', edgecolor='black', alpha=0.6, density=True)
-    plt.plot((bins[:-1] + bins[1:]) / 2, n, color='#004494', linestyle='-', linewidth=2)
-    plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
-    plt.title(f'5: Satisfaction in {city}')
-    plt.xlabel('Satisfaction')
-    plt.ylabel('Percentage')
-    plt.xticks([1, 2, 3, 4, 5, 6])
-    plt.show()
     
 def heatmapTimeSafe(data, city, custom_yticks = [7.5, 22.5, 37.5, 52.5, 67.5, 82.5, 95.0], 
                     custom_ytick_labels = ["0-15", "15-30", "30-45", "45-60", "60-75", "75-90", "> 90"],

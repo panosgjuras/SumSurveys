@@ -1,4 +1,4 @@
-root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData"
+root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData" # Change it
 
 import os
 import pandas as pd
@@ -6,9 +6,10 @@ from sumSurveyRenameSelect import callData, missCols, excludeCity
 from sumSurveyReplacer import rePlacer, newAssessDF, genRandomTime, fill_na_empirical, sociodummies
 from sumAssessAnalysis import (dstatsAssess, heatmapTimeSafe2,
                                plotModalSplit3, heatmapModeTime2, heatmapModePurp,
-                               heatmapPeakOff, corrTable, visualizeCorr, DistRtable, visualizeCompare, kolmoTable)
+                               heatmapPeakOff, corrTable, visualizeCorr, DistRtable, visualizeCompare, kolmoTable, satisfyHist)
 from sumSurveyFixKrakow import fixKra
-from sumSurveyDiariesProc import createDiariesDf, addTripDist
+from sumSurveyDiariesProc import createDiariesDf
+# from sumSurveyDiariesProc import addTripDist
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -32,12 +33,12 @@ import numpy as np
 # from sumSurveyFixCoimbra import fixCoimbra
 
 # A. set of Living Labs - Cities
-cIE = ['Athens', 'Munich', 'Rotterdam', 'Larnaca', 'Krakow', 'Fredrikstad', 'Coimbra', 'Jerusalem'] 
+cIE = ['Athens', 'Munich', 'Rotterdam', 'Geneva' , 'Larnaca', 'Krakow', 'Fredrikstad', 'Coimbra', 'Jerusalem'] 
 
 # sets of selected variables
 sele1 = ['nonpeakCar', 'nonpeakTaxi', 'nonpeakPT', 'nonpeakMoto', 'nonpeakBike', 'nonpeakWalk',
             'peakCar', 'peakTaxi', 'peakPT', 'peakMoto', 'peakBike', 'peakWalk'] 
-sele2 = ['afford']
+sele2 = ['afford', 'satisfy']
 sele3 = ['psafeCar', 'psafeTaxi', 'psafePT', 'psafeBike','psafeMoto', 'psafeWalk']
 sele4 = ['perSafeCar', 'perSafeTaxi', 'perSafePT', 'perSafeBike','perSafeMoto', 'perSafeWalk']    
 sele5 = ['reliable']
@@ -112,8 +113,8 @@ diaries = rePlacer(diaries, 'purp') # replace the trip purposes based on the map
 diaries['time'] =  diaries['time'].apply(genRandomTime) # generate travel times and other
 
 # 77. Paper32 - SumSurvey first analyis
-assessDF = excludeCity(assessDF, cIE, 'Geneva')[0] # the paper does not consider percpetion assessment data from Geneva
-diaries = excludeCity(diaries, cIE, 'Geneva')[0] # the paper does not consider diaries from Geneva. They are all commuters!
+# assessDF = excludeCity(assessDF, cIE, 'Geneva')[0] # the paper does not consider percpetion assessment data from Geneva
+# diaries = excludeCity(diaries, cIE, 'Geneva')[0] # the paper does not consider diaries from Geneva. They are all commuters!
 cIE = excludeCity(assessDF, cIE, 'Geneva')[1] # exclude geneva from the cities list
 # corr = corrTable(assessDF, sele, 'figuresTables/9_correlogram.xlsx', 0.05) # estimate a table with correlations
 # print(corr.dtypes)
@@ -135,13 +136,11 @@ repx = ["0-15", "15-30", "30-45", "45-60", "60-75", "75-90", ">90"] # time intev
 # Plots for D1.2
 # for c in cIE: heatmapPeakOff(assessDF, c, valx, repx) # peak vs nonpeak per transport mode
 # for c in cIE: heatmapTimeSafe2(assessDF, c, valx, repx) # peak vs psafe per transport mode
-# for c in cIE: heatmapModeTime2(diaries, c) # mode vs time distribution
-# for c in cIE: heatmapModePurp(diaries, c) # mode vs trip purpose distribution
+for c in cIE: heatmapModeTime2(diaries, c) # mode vs time distribution
+for c in cIE: heatmapModePurp(diaries, c) # mode vs trip purpose distribution
 
-out = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData/finalDatasets"
-#socio.to_csv(os.path.join(out, "SumSurveySocioV2.csv"), index = False)
+# socio.to_csv(os.path.join(out, "SumSurveySocioV2.csv"), index = False)
 # assessDF.to_csv(os.path.join(out, "SumSurveyAssessV2.csv"), index = False)
 
-
-
-
+heatmapModeTime2(diaries, 'Geneva')
+heatmapModePurp(diaries, 'Geneva')
