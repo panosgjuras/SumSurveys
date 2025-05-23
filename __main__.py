@@ -11,6 +11,7 @@ It requires the raw data from a SumSurvey. They are not publicly available.
 National Technical University of Athens
 Research project: SUM
 """
+
 # %% Import the SumSurveyTools package
 
 root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData" # The path with raw data

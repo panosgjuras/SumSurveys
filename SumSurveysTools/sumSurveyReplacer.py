@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Tools to replace unique responses
+
+@author: panosgtzouras
+National Technical University of Athens
+Research project: SUM
+"""
+
 import pandas as pd
 import random
 from sumSurveyMapping import mapping

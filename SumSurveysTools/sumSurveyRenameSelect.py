@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Rename and select tools
+
+@author: panosgtzouras
+National Technical University of Athens
+Research project: SUM
+"""
+
 import os
 import pandas as pd
 import numpy as np
@@ -5,24 +15,8 @@ import numpy as np
 from sumSurveyFixCoimbra import fixCoimbra
 from sumSurveyCityParams import pidValue, droper
 
-root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData"
-
-# change only the city to prepare the data
-# city = 'Athens'
-
-# df = pd.read_csv(os.path.join(root_dir, 'sampleDatasets' ,city, 'surveyDataset.csv'), delimiter=',',
-#                 header = head(city) )
-
-# def reNamers(df, city):
-#    matcher = pd.read_csv(saveCols(df, city), encoding= encode(city))
-#    return matcher
-
-# saveCols(df, city, fix = 'yes')
-
-# df = reNamer(df, city)
-
-def callMatcher(df, city):
-    saveColsPath = os.path.join(root_dir, 'questionsMatch', 'matcher' + city + '.csv')
+def callMatcher(df, city, path):
+    saveColsPath = os.path.join(path, 'questionsMatch', 'matcher' + city + '.csv')
     delm = ","
     matcher = pd.read_csv(saveColsPath, delimiter = delm)
     # matcher = pd.read_csv(saveColsPath, delimiter=';')
@@ -49,17 +43,10 @@ def reSelect(df, city):
     # df.to_csv(saveDatPath, index = False, encoding = encode(city)  )
     return df
 
-
-# df = pd.read_csv(os.path.join(root_dir, 'sampleDatasets' ,city, 'surveyDataset.csv'), delimiter=',', 
-#                 header = None )
-
-# city = 'Rotterdam'
-# matcher = pd.read_csv(os.path.join(root_dir, 'questionsMatch', 'matcher' + city + '.csv'), delimiter=';')
-
-def callData(city, when ="", match = 'yes'):
+def callData(city, path, when ="", match = 'yes'):
     
     if (city == 'Athens' or city == 'Munich' or city == 'Krakow' or city == 'Larnaca' or city == 'Geneva' or city == 'Jerusalem'): 
-            file_path = os.path.join(root_dir, 'rawDatasets' , city, when,'surveyDataset.xlsx')
+            file_path = os.path.join(path, 'rawDatasets' , city, when,'surveyDataset.xlsx')
             data = pd.read_excel(file_path)
             # Save as CSV
             csv_file_path = file_path.replace('.xlsx', '.csv')
@@ -70,7 +57,7 @@ def callData(city, when ="", match = 'yes'):
             # print(df)
 
     if city == 'Fredrikstad': # save the variables columns
-        file_path = os.path.join(root_dir, 'rawDatasets' , city, when,'surveyDataset.xlsx')
+        file_path = os.path.join(path, 'rawDatasets' , city, when,'surveyDataset.xlsx')
         tab_name = 'Complete'
         data = pd.read_excel(file_path, sheet_name=tab_name)
         csv_file_path = file_path.replace('.xlsx', '.csv')
@@ -78,12 +65,12 @@ def callData(city, when ="", match = 'yes'):
         df = pd.read_csv(csv_file_path, header = None)
     
     if city == 'Rotterdam':
-        file_path = os.path.join(root_dir, 'rawDatasets' , city, when, 'surveyDataset.xlsx')
+        file_path = os.path.join(path, 'rawDatasets' , city, when, 'surveyDataset.xlsx')
         csv_file_path = file_path.replace('.xlsx', '.csv')
         df = pd.read_csv(csv_file_path, header = None)
     
     if city == 'Coimbra':
-        file_path = os.path.join(root_dir, 'rawDatasets' , city, when,'surveyDataset.xlsx')
+        file_path = os.path.join(path, 'rawDatasets' , city, when,'surveyDataset.xlsx')
         data = pd.read_excel(file_path)
         data = fixCoimbra(data)
         # Save as CSV
@@ -123,11 +110,11 @@ def callData(city, when ="", match = 'yes'):
     
     return df, matcher
 
-def saveCols(df, city, maxx = 1):
+def saveCols(df, city, path, maxx = 1):
     first_row = df.iloc[0:1]
     
     name = 'columns' + city + '.xlsx'
-    link = os.path.join(root_dir, 'questionsMatch', name)
+    link = os.path.join(path, 'questionsMatch', name)
     first_row.to_excel(link, index=False)
 
 def missCols(df, columns):
