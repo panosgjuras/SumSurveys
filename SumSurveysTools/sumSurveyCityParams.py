@@ -1,7 +1,15 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+City parameters for data processing
+
+@author: panosgtzouras
+National Technical University of Athens
+Research project: SUM
+"""
+
 import pandas as pd
 import os
-
-root_dir = os.path.dirname(os.path.realpath(__file__))
 
 def droper (df, city):
     if city == 'Rotterdam':
@@ -86,9 +94,9 @@ def pidValue(city):
     else: pidValue = 0
     return pidValue
 
-def saveCols(df, city):
-    saveColsPath = os.path.join(root_dir, 'questionsMatch', 'columns' + city + '.csv')
-    df = pd.read_csv(os.path.join(root_dir, 'sampleDatasets' ,city, 'surveyDataset.csv'), delimiter=',', 
+def saveCols(df, city, path):
+    saveColsPath = os.path.join(path, 'questionsMatch', 'columns' + city + '.csv')
+    df = pd.read_csv(os.path.join(path, 'sampleDatasets' ,city, 'surveyDataset.csv'), delimiter=',', 
                          header = head(city))
     cols = pd.DataFrame(df.columns.tolist())
     cols['name2'] = 'NotFound'

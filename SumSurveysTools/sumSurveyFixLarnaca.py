@@ -1,9 +1,16 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Functions to transform Larnaca Survey data
+
+@author: panosgtzouras
+National Technical University of Athens
+Research project: SUM
+"""
+
 import pandas as pd
 import os
 import numpy as np
-
-root_dir = os.path.dirname(os.path.realpath(__file__))
-larnaca_data = pd.read_csv('setLarnaca.csv')
 
 # Function to determine the value for the 'afford' column based on the criteria
 def determine_afford(row):

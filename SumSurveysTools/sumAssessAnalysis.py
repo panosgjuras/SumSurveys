@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Data analysis and visualization functions
+
+@author: panosgtzouras
+National Technical University of Athens
+Research project: SUM
+"""
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
@@ -8,8 +18,6 @@ from itertools import combinations
 from scipy.stats import mannwhitneyu
 import numpy as np
 import os
-
-root_dir = os.path.dirname(os.path.realpath(__file__))
 
 end_color_rgb = (148, 191, 65)  # RGB for light green
 start_color_rgb = (35, 79, 145)     # RGB for deep blue
@@ -209,9 +217,6 @@ def heatmapModeTime(data, city, xk = 7, yk = 7):
     plt.title(f'{city}')
     plt.show
 
-
-
-import pandas as pd
 
 def prepareHeatMap(mode_data, custom_yticks, custom_xticks, peak_col_name, psafe_col_name, type = 'perecentage'):
     """

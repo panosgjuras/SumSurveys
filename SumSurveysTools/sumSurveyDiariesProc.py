@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Diaries processing functions
+
+@author: panosgtzouras
+National Technical University of Athens
+Research project: SUM
+"""
+
 import pandas as pd
 import os
 import googlemaps
@@ -5,13 +15,6 @@ import geopandas as gpd
 from shapely.geometry import Point
 from tqdm import tqdm
 import numpy as np
-
-root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData"
-# GoogleMapKey = ""
-
-# gmaps = googlemaps.Client(key=GoogleMapKey)
-
-location_points = pd.read_csv(os.path.join(root_dir, "finalDatasets", "locPointsUpd.csv"))
 
 def createDiariesDf(df):
     for i in range(2, 6):
@@ -31,29 +34,29 @@ def createDiariesDf(df):
     print(cdf.head())
     return (cdf)
 
-def geocodeGoogle(addresses):
-    results = []
-    total_addresses = len(addresses)
+# def geocodeGoogle(addresses):
+#     results = []
+#     total_addresses = len(addresses)
     
-    # Process each address and track progress
-    for idx, address in enumerate(addresses):
-        try:
-            geocode_result = gmaps.geocode(address)  # Google Maps API call
-            if geocode_result:
-                # If geocoding is successful, store the coordinates (latitude, longitude)
-                lat_lng = geocode_result[0]['geometry']['location']
-                results.append((lat_lng['lat'], lat_lng['lng']))
-            else:
-                results.append(None)  # No result found
-        except Exception as e:
-            print(f"Error geocoding {address}: {e}")
-            results.append(None)  # Error during geocoding
+#     # Process each address and track progress
+#     for idx, address in enumerate(addresses):
+#         try:
+#             geocode_result = gmaps.geocode(address)  # Google Maps API call
+#             if geocode_result:
+#                 # If geocoding is successful, store the coordinates (latitude, longitude)
+#                 lat_lng = geocode_result[0]['geometry']['location']
+#                 results.append((lat_lng['lat'], lat_lng['lng']))
+#             else:
+#                 results.append(None)  # No result found
+#         except Exception as e:
+#             print(f"Error geocoding {address}: {e}")
+#             results.append(None)  # Error during geocoding
         
-        # Calculate percentage of processed rows
-        percentage_processed = ((idx + 1) / total_addresses) * 100
-        print(f"Processing progress: {percentage_processed:.2f}% completed.")
+#         # Calculate percentage of processed rows
+#         percentage_processed = ((idx + 1) / total_addresses) * 100
+#         print(f"Processing progress: {percentage_processed:.2f}% completed.")
     
-    return results
+#     return results
 
 def savelocPoints(df, coords_column, location_column, output_shp_path):
     valid_coords = df.dropna(subset=[coords_column])
@@ -71,7 +74,8 @@ def savelocPoints(df, coords_column, location_column, output_shp_path):
     gdf_subset.to_file(output_shp_path, driver='ESRI Shapefile')
     return gdf
     
-def calculate_distance(orig_lat, orig_lon, dest_lat, dest_lon):
+def calculate_distance(orig_lat, orig_lon, dest_lat, dest_lon,
+                       API_KEY = None):
     """
     Calculate the distance between two points using Google Maps Distance Matrix API.
     
@@ -87,6 +91,8 @@ def calculate_distance(orig_lat, orig_lon, dest_lat, dest_lon):
     # Use the Google Maps Distance Matrix API
     origin = (orig_lat, orig_lon)
     destination = (dest_lat, dest_lon)
+    
+    gmaps = googlemaps.Client(key=API_KEY)
     
     # Get the distance
     result = gmaps.distance_matrix([origin], [destination], mode="driving")  # Mode can be "walking", "bicycling", etc.
@@ -113,21 +119,12 @@ def convert_to_meters(distance_str):
             return float(distance_str.replace(' m', ''))/1000
     return np.nan  # Return np.nan if the input is None or cannot be processed
 
-def addTripDist(df, locPointsUpd2 = location_points):
+def addTripDist(df, path):
+    
+    locPointsUpd2 = pd.read_csv(os.path.join(path, "finalDatasets", "locPointsUpd.csv"))
     
     df["origC"] = df["orig"] + ", " + df["city"]
     df["destC"] = df["dest"] + ", " + df["city"]
-
-    # locPoints = pd.DataFrame(pd.concat([df['origC'], df['destC']]).unique(), columns=['location'])
-    # locPoints['coords'] = geocodeGoogle(locPoints['location']) 
-    # savelocPoints(locPoints, 'coords', 'location', os.path.join(root_dir, 'locPointsCoords.shp'))
-
-    # locPointsUpd = gpd.read_file(os.path.join(root_dir, 'locPointsCoordsUpd.shp'))
-    # locPoints = locPoints[~locPoints['location'].isin(['An area within Jerusalem, Jerusalem', 'Another area in the country, Jerusalem',
-    #                                                   'Nee, Rotterdam'])]
-    # locPointsUpd['location2'] = locPoints["location"]
-    # locPointsUpd.to_csv(os.path.join(root_dir, "locPointsUpd.csv"))
-    
     
     # Merge for 'origC' and add suffix '_orig' for latitude and longitude columns
     df = df.merge(

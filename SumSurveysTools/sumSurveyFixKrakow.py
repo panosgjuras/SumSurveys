@@ -1,10 +1,16 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Functions to transform Krakow Survey data
+
+@author: panosgtzouras
+National Technical University of Athens
+Research project: SUM
+"""
+
 import pandas as pd
 import os
 from sumSurveyRenameSelect import callData
-
-# root_dir = os.path.dirname(os.path.realpath(__file__))
-
-root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData"
 
 def kraDiar(df, kradiar):
     
@@ -22,11 +28,6 @@ def kraDiar(df, kradiar):
     'Proszę wskazać godzinny, w jakich odbywała się Pani/Pana podróż?': 'time'}
     
     
-    # kradiar = pd.read_csv(os.path.join(root_dir, 'sampleDatasets' , 'Krakow', 'diaryDatasetKra.csv'), delimiter=';',
-    #                     header = 0)
-    
-    # print(kradiar)
-    
     kradiar = kradiar.rename(columns=column_mapping)
     # print(kradiar)
 
@@ -38,13 +39,10 @@ def kraDiar(df, kradiar):
     
     return ndf
 
-def fixKra(df, w, root = root_dir): 
+def fixKra(df, w, path): 
     kra = kraDiar(callData('Krakow', when = w)[0][['pid', 'city', 'GlobalID']], 
-              pd.read_csv(os.path.join(root, 'rawDatasets' , 'Krakow', 'diaryDatasetKra.csv'), delimiter=';'))
+              pd.read_csv(os.path.join(path, 'rawDatasets' , 'Krakow', 'diaryDatasetKra.csv'), delimiter=';'))
     df = pd.concat([df, kra],ignore_index=True).dropna(subset=['mode', 'purp', 'time'])
     # df = df.drop(columns = ['dest'])
     return df
 
-w = "finalBefore"
-
-kra = pd.read_csv(os.path.join(root_dir, 'rawDatasets' , 'Krakow', 'diaryDatasetKra.csv'), delimiter=';')
