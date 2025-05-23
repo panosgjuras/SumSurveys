@@ -16,7 +16,7 @@ Research project: SUM
 
 root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData" # The path with raw data
 
-import SumSurveysTools
+import SumSurveysTools.sumSur
 
 from SumSurveysTools.sumSurveyRenameSelect import callData
 
