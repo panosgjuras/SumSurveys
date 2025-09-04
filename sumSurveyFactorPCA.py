@@ -1,9 +1,15 @@
+
 import pandas as pd
+
 import os
 import numpy as np
 from factor_analyzer import FactorAnalyzer
 from sklearn.decomposition import PCA
 from factor_analyzer.factor_analyzer import calculate_bartlett_sphericity
+from factor_analyzer.factor_analyzer import calculate_kmo
+import matplotlib.pyplot as plt
+
+# %% Main functions
 
 def fillAssessNans(df, cols_with_nans, city_col='city'):
     """
@@ -34,18 +40,18 @@ def fillAssessNans(df, cols_with_nans, city_col='city'):
 
     return df  # Return the updated dataframe
 
-def factorAna(X, n):
-#    np.random.seed(42)
-    fa = FactorAnalyzer(n_factors = n, rotation="oblimin")
-    fa.fit(X)
+# def factorAna(X, n):
+# #    np.random.seed(42)
+#     fa = FactorAnalyzer(n_factors = n, rotation="varimax")
+#     fa.fit(X)
     
-    loadings = pd.DataFrame(fa.loadings_, index=X.columns)
-    print(loadings)
+#     loadings = pd.DataFrame(fa.loadings_, index=X.columns)
+#     print(loadings)
     
-    variance_explained = fa.get_factor_variance()
-    print(f"Variance Explained per Factor:\n{variance_explained[1]}")
-    print(f"Cumulative Variance Explained: {variance_explained[2][-1]:.2f}")
-    return fa, loadings
+#     variance_explained = fa.get_factor_variance()
+#     print(f"Variance Explained per Factor:\n{variance_explained[1]}")
+#     print(f"Cumulative Variance Explained: {variance_explained[2][-1]:.2f}")
+#     return fa, loadings
 
 def relativeVars(df, refmode = "Car", asModes = ["Taxi", "PT", "Moto", "Bike", "Walk"]):
     for m in asModes:
@@ -55,39 +61,43 @@ def relativeVars(df, refmode = "Car", asModes = ["Taxi", "PT", "Moto", "Bike", "
         df["diffpsafe" + m] = df["psafe" + m] - df["psafe" + refmode]
     return df
 
-def removeLoads(loadings, threshold = 0.3, n_factors=6):
+# def removeLoads(loadings, threshold = 0.3, n_factors=6):
 
-    # Step 1: Identify variables to drop based on the threshold
-    low_loading_vars = []
+#     # Step 1: Identify variables to drop based on the threshold
+#     low_loading_vars = []
 
-    # Calculate factor loadings using the FactorAnalyzer
-    fa = FactorAnalyzer(n_factors=n_factors, rotation="oblimin")
-    fa.fit(X)
-    loadings = pd.DataFrame(fa.loadings_, index=X.columns)
+#     # Calculate factor loadings using the FactorAnalyzer
+#     fa = FactorAnalyzer(n_factors=n_factors, rotation="oblimin")
+#     fa.fit(X)
+#     loadings = pd.DataFrame(fa.loadings_, index=X.columns)
 
-    # Iterate over each variable (each row in the loadings dataframe)
-    for index, row in loadings.iterrows():
-        if all(abs(row) < threshold):  # If all factors for this variable have loadings below the threshold
-            low_loading_vars.append(index)
+#     # Iterate over each variable (each row in the loadings dataframe)
+#     for index, row in loadings.iterrows():
+#         if all(abs(row) < threshold):  # If all factors for this variable have loadings below the threshold
+#             low_loading_vars.append(index)
 
-    # Step 2: Remove the identified low-loading variables
-    X_filtered = X.drop(columns=low_loading_vars)
+#     # Step 2: Remove the identified low-loading variables
+#     X_filtered = X.drop(columns=low_loading_vars)
 
-    # Step 3: Re-run Factor Analysis with the filtered data
-    fa.fit(X_filtered)
+#     # Step 3: Re-run Factor Analysis with the filtered data
+#     fa.fit(X_filtered)
 
-#    new_loadings = pd.DataFrame(fa.loadings_, index=X_filtered.columns)
+# #    new_loadings = pd.DataFrame(fa.loadings_, index=X_filtered.columns)
     
-    variance_explained = fa.get_factor_variance()
-    print(f"\nVariance Explained per Factor:\n{variance_explained[1]}")  # Proportion per factor
-    print(f"Cumulative Variance Explained: {variance_explained[2][-1]:.2f}")  # Should be > 0.60
-    return X_filtered
+#     variance_explained = fa.get_factor_variance()
+#     print(f"\nVariance Explained per Factor:\n{variance_explained[1]}")  # Proportion per factor
+#     print(f"Cumulative Variance Explained: {variance_explained[2][-1]:.2f}")  # Should be > 0.60
+    
+#     return X_filtered
+
+# %% Import the dataset, specify the target variables
 
 root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData"
 
 df = pd.read_csv(os.path.join(root_dir, "finalDatasets", "SumSurveyAssessV5.csv"))
 df = df[df.city != "Geneva"]
 
+# Extra changes in the dataset
 df.loc[df['waitBus'] == 1014.5, 'waitBus'] = np.nan
 df.loc[df['waitTrain'] == 1014.5, 'waitTrain'] = np.nan
 
@@ -101,37 +111,78 @@ assessCols = ["afford",
 #              "diffperSafeWalk",
               "diffpsafeBike", "diffpsafeMoto", "diffpsafeWalk",
 #              "diffpsafePT", "diffpsafeTaxi"
-              "reliable",
-              "relpeakBike", "relpeakMoto", "relpeakPT", "relpeakTaxi", "relpeakWalk",
-#              "relnonpeakBike", "relnonpeakMoto", "relnonpeakPT", "relnonpeakTaxi", "relnonpeakWalk",
-              "waitBus", "waitTrain",
+#              "reliable",
+              "relpeakBike", 
+              "relpeakMoto", 
+#              "relpeakPT", 
+              "relpeakTaxi", "relpeakWalk",
+#      "relnonpeakBike", "relnonpeakMoto", "relnonpeakPT", "relnonpeakTaxi", "relnonpeakWalk",
+                "waitBus", 
+                "waitTrain",
               "walkBus", "walkTrain"]
 pid = df['pid']
 
-nf = 5
-X = df[assessCols]
+
+# %% Test for sample adequacy
 
 # Bartlett’s test of sphericity
-chi_square_value, p_value = calculate_bartlett_sphericity(X)
+chi_square_value, p_value = calculate_bartlett_sphericity(df[assessCols])
 
 print(f"Chi-square: {chi_square_value:.4f}")
 print(f"P-value: {p_value:.4f}")
 
-if p_value < 0.05:
-    print("The correlation matrix is not an identity matrix — suitable for factor analysis.")
-else:
-    print("The correlation matrix is close to an identity matrix — not suitable for factor analysis.")
+# if p_value < 0.05:
+#     print("The correlation matrix is not an identity matrix — suitable for factor analysis.")
+# else:
+#     print("The correlation matrix is close to an identity matrix — not suitable for factor analysis.")
 
+# KMO test
+kmo_all, kmo_model = calculate_kmo(df[assessCols])
 
+print("KMO for each variable:")
+print(pd.Series(kmo_all, index=assessCols))
+print("\nOverall KMO:", round(kmo_model, 3))
 
-fa = factorAna(X, nf)[0]
-l = factorAna(X, nf)[1]
+# %% Create the Scree plot to decide the number of factors
 
-X = removeLoads(l, threshold=0.45, n_factors = nf)
-fa = factorAna(X, nf)[0]
-l = factorAna(X, nf)[1]
+# Run factor analysis without rotation, get eigenvalues
+fa = FactorAnalyzer(rotation=None)
+fa.fit(df[assessCols])
 
-for f in l.columns:  print(l.loc[abs(l[f]) > 0.10])
+eigen_values, vectors = fa.get_eigenvalues()
+
+# Scree plot
+plt.scatter(range(1, len(eigen_values)+1), eigen_values)
+plt.plot(range(1, len(eigen_values)+1), eigen_values)
+# plt.title('Scree Plot')
+plt.xlabel('Factor')
+plt.ylabel('Eigenvalue')
+plt.grid()
+plt.show()
+
+total_vars = len(assessCols)
+variance_explained = eigen_values / sum(eigen_values) * 100
+cumulative_variance = variance_explained.cumsum()
+
+for i, (ev, var, cum) in enumerate(zip(eigen_values, variance_explained, cumulative_variance), start=1):
+     print(f"Factor {i}: eigenvalue={ev:.3f}, variance explained={var:.2f}%, cumulative={cum:.2f}%")
+
+# %% Run the Factor Analysis
+
+X = df[assessCols]
+nf = 5
+
+fa = FactorAnalyzer(n_factors = nf, rotation="oblimin")
+fa.fit(X)
+    
+loadings = pd.DataFrame(fa.loadings_, index=X.columns)
+print(loadings)
+
+communalities = fa.get_communalities()
+print(pd.Series(communalities, index=assessCols))
+# %%
+
+# for f in l.columns:  print(l.loc[abs(l[f]) > 0.10])
 
 factor_scores = X.dot(fa.loadings_)
 factor_scores.columns = [f"factor_{i+1}" for i in range(factor_scores.shape[1])]
@@ -139,23 +190,14 @@ factor_scores['pid'] = pid
 
 df = pd.merge(df, factor_scores, on='pid', how='left')
     
-df.to_csv(os.path.join(root_dir, "finalDatasets", "SumSurveyAssessV6.csv"))
+# df.to_csv(os.path.join(root_dir, "finalDatasets", "SumSurveyAssessV8.csv"))
 
+# %%
+# Select only factor scores
+factor_score_cols = [col for col in df.columns if col.startswith("factor_")]
 
-for c in df["city"].unique():
-    print(f"\nCity: {c}")
-    city_group = df[df["city"] == c].groupby("relpeakTaxi").mean()  # Compute mean for each group
-    print(city_group)
-    
-    
-    
-    
-city_name = 'Munich'
-city_data = df[df["city"] == city_name] 
-x = city_data.mean(numeric_only=True)
+# Compute correlation matrix
+factor_score_corr = df[factor_score_cols].corr()
 
-
-
-
-city_means = df.groupby("city").mean(numeric_only=True).T
-city_means.to_csv(os.path.join(root_dir, "finalDatasets", "assessDescrStatsV1.csv"))
+print("Correlation matrix of factor scores:")
+print(factor_score_corr)
