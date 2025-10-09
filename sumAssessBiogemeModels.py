@@ -6,7 +6,10 @@ import matplotlib.pyplot as plt
 # import seaborn as sns
 import numpy as np
 
-from sumSurveyReplacer import sociodummies
+os.chdir("/Users/panosgtzouras/Desktop/github_tzouras/SumSurveys")
+from SumSurveysTools.sumSurveyReplacer import sociodummies
+
+# from sumSurveyReplacer import sociodummies
 
 import biogeme.database as db
 import biogeme.biogeme as bio
@@ -20,6 +23,9 @@ from biogeme.expressions import (Beta,
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 import seaborn as sns
+# %%
+
+
 
 def criticalBarsHor(diaries, var, color_map, xlabel = "", normalize = True, agg_method = "sum"):
     """
@@ -82,31 +88,31 @@ def criticalBarsHor(diaries, var, color_map, xlabel = "", normalize = True, agg_
     # Show plot
     plt.show()
 
-def boxFactorPlot(ax, df, factor, city_col, ylim = [0, 100]):
-    """
-    Creates a box plot for the given factor, with cities on the x-axis.
+# def boxFactorPlot(ax, df, factor, city_col, ylim = [0, 100]):
+#     """
+#     Creates a box plot for the given factor, with cities on the x-axis.
     
-    Parameters:
-    df (DataFrame): The dataset containing the factor and city column.
-    factor (str): The column name of the factor to plot.
-    city_col (str): The column name representing the cities.
+#     Parameters:
+#     df (DataFrame): The dataset containing the factor and city column.
+#     factor (str): The column name of the factor to plot.
+#     city_col (str): The column name representing the cities.
     
-    Returns:
-    None (Displays the plot)
-    """
-    plt.figure(figsize=(10, 10), dpi = 500)
-    sorted_cities = sorted(df[city_col].unique())
+#     Returns:
+#     None (Displays the plot)
+#     """
+#     plt.figure(figsize=(10, 10), dpi = 500)
+#     sorted_cities = sorted(df[city_col].unique())
     
-    sns.boxplot(x=df[city_col], y=df[factor], order = sorted_cities,
-                color = "#FF632F", ax = ax)
+#     sns.boxplot(x=df[city_col], y=df[factor], order = sorted_cities,
+#                 color = "#FF632F", ax = ax)
 
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)  # Rotate city names for better readability
-    ax.set_xlabel("")
-    ax.set_ylim(ylim)
-    ax.set_ylabel(factor.replace("_", " ").title() + " score")
-#    plt.title(f"Box Plot of {factor.replace('_', ' ').title()} by City")
+#     ax.set_xticklabels(ax.get_xticklabels(), rotation=45)  # Rotate city names for better readability
+#     ax.set_xlabel("")
+#     ax.set_ylim(ylim)
+#     ax.set_ylabel(factor.replace("_", " ").title() + " score")
+# #    plt.title(f"Box Plot of {factor.replace('_', ' ').title()} by City")
 
-    ax.grid(axis="y", linestyle="--", alpha=0.7)
+#     ax.grid(axis="y", linestyle="--", alpha=0.7)
 
 def MNLest(df, V, av, cho, name):
     logprob = models.loglogit(V, av, cho) # import utilities in loglogit
@@ -191,9 +197,9 @@ class utils:
              + b.FACTOR_4 * factor_4
              + b.FACTOR_5 * factor_5
 
-             + b.CLASS_2 * class_2
-             + b.CLASS_3 * class_3
-             + b.CLASS_4 * class_4
+#             + b.CLASS_2 * class_2
+#             + b.CLASS_3 * class_3
+#             + b.CLASS_4 * class_4
              
              + b.MUN * Munich
              + b.ATH * Athens + b.ROT * Rotterdam 
@@ -228,7 +234,7 @@ socio = pd.read_csv(os.path.join(root_dir,'finalDatasets','SumSurveySocioV3.csv'
 socio["s_class"] = "class " + socio["class"].astype('str')  
 # diaries.to_csv(os.path.join(root_dir,'finalDatasets','SumSurveyDiariesV2.csv'))
 
-assess = pd.read_csv(os.path.join(root_dir, "finalDatasets", "SumSurveyAssessV6.csv"))
+assess = pd.read_csv(os.path.join(root_dir, "finalDatasets", "SumSurveyAssessV8.csv"))
 
 # Define the color map
 color_map_mode = {
@@ -272,24 +278,24 @@ criticalBarsHor(df, ['cityhier', 'mode'], color_map_mode, xlabel = 'percentage (
 criticalBarsHor(df, ['cityhier', 's_class'], color_map = color_map_class,
                 xlabel = 'Number of respondents', normalize = False, agg_method = "count")
 
-#for f in ['factor_1', 'factor_2', 'factor_3', 'factor_4', 'factor_5']:
-#     boxFactorPlot(df, f, 'cityhier')
+# #for f in ['factor_1', 'factor_2', 'factor_3', 'factor_4', 'factor_5']:
+# #     boxFactorPlot(df, f, 'cityhier')
 
-# Create 3x2 grid of subplots
-fig, axes = plt.subplots(3, 2, figsize=(15, 20), dpi=500)
+# # Create 3x2 grid of subplots
+# fig, axes = plt.subplots(3, 2, figsize=(15, 20), dpi=500)
 
-# Create the box plots in the 3x2 grid
-boxFactorPlot(axes[0, 0], df, 'factor_1', 'cityhier', ylim=[0, 25])
-boxFactorPlot(axes[0, 1], df, 'factor_2', 'cityhier', ylim=[-15, 15])
-boxFactorPlot(axes[1, 0], df, 'factor_3', 'cityhier', ylim=[-15, 15])
-boxFactorPlot(axes[1, 1], df, 'factor_4', 'cityhier', ylim=[0, 10])
-boxFactorPlot(axes[2, 0], df, 'factor_5', 'cityhier', ylim=[0, 80])
+# # Create the box plots in the 3x2 grid
+# boxFactorPlot(axes[0, 0], df, 'factor_1', 'cityhier', ylim=[0, 25])
+# boxFactorPlot(axes[0, 1], df, 'factor_2', 'cityhier', ylim=[-15, 15])
+# boxFactorPlot(axes[1, 0], df, 'factor_3', 'cityhier', ylim=[-15, 15])
+# boxFactorPlot(axes[1, 1], df, 'factor_4', 'cityhier', ylim=[0, 10])
+# boxFactorPlot(axes[2, 0], df, 'factor_5', 'cityhier', ylim=[0, 80])
 
-fig.delaxes(axes[2,1])
+# fig.delaxes(axes[2,1])
 
-# Adjust layout
-plt.tight_layout()
-plt.show()
+# # Adjust layout
+# plt.tight_layout()
+# plt.show()
 
 
 
@@ -310,11 +316,11 @@ df = df[['pid', 'city', 'carchoice', 'work','fdistance', 'factor_1', 'factor_2',
 
 df = sociodummies(df, categorical_cols = ['city'] )
 
-checkVIF(df.drop(columns = ['class_1', 'pid', 'carchoice']))
+# checkVIF(df.drop(columns = ['class_1', 'pid', 'carchoice']))
 # exclude = 'factor_3'
 # checkVIF(df.drop(columns = ['Munich', 'pid', 'factor_4', 'class_1', 'factor_1', 'class_4']))
 
-name = "sumSurvey_General_v3.3.4"
+name = "sumSurvey_General_v3.2.4.1"
 database = db.Database('sumSurvey_General', df.drop(columns = ["pid", 'city']))
 b = betas(0, -1000, 1000, 0)
 u = utils(database, b)
@@ -330,7 +336,7 @@ p.to_csv(os.path.join(out_dir, name + ".csv"))
 #    u = utils(database, b)
 #    p = MNLest(database, u.get_MNL(), u.get_modecho_av(), u.get_cho(), name)
 
-# checkVIF(df, df.drop(columns = ["pid", 'city']).columns)
+checkVIF(df.drop(columns = ["pid", 'city', 'class_1', 'carchoice']))
 
 # # List of categorical columns
 # categorical_cols = ["gender", "age", "educ", "employ", "income"]
@@ -361,3 +367,14 @@ p.to_csv(os.path.join(out_dir, name + ".csv"))
 # # Display the transformed DataFrame
 # print(final_df_wide.head())
 
+
+# Define factors and city columns
+factor_cols = [f"factor_{i}" for i in range(1, 6)]
+city_cols = ['Athens', 'Coimbra', 'Fredrikstad', 'Jerusalem', 
+             'Krakow', 'Larnaca', 'Munich', 'Rotterdam']
+
+# Correlation between factors and cities only
+factor_city_corr = df[factor_cols + city_cols].corr().loc[factor_cols, city_cols]
+
+print("Correlation table between factors and cities:")
+print(factor_city_corr.round(3))

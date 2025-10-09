@@ -1,6 +1,7 @@
 
 import pandas as pd
 
+import seaborn as sns
 import os
 import numpy as np
 from factor_analyzer import FactorAnalyzer
@@ -61,34 +62,31 @@ def relativeVars(df, refmode = "Car", asModes = ["Taxi", "PT", "Moto", "Bike", "
         df["diffpsafe" + m] = df["psafe" + m] - df["psafe" + refmode]
     return df
 
-# def removeLoads(loadings, threshold = 0.3, n_factors=6):
-
-#     # Step 1: Identify variables to drop based on the threshold
-#     low_loading_vars = []
-
-#     # Calculate factor loadings using the FactorAnalyzer
-#     fa = FactorAnalyzer(n_factors=n_factors, rotation="oblimin")
-#     fa.fit(X)
-#     loadings = pd.DataFrame(fa.loadings_, index=X.columns)
-
-#     # Iterate over each variable (each row in the loadings dataframe)
-#     for index, row in loadings.iterrows():
-#         if all(abs(row) < threshold):  # If all factors for this variable have loadings below the threshold
-#             low_loading_vars.append(index)
-
-#     # Step 2: Remove the identified low-loading variables
-#     X_filtered = X.drop(columns=low_loading_vars)
-
-#     # Step 3: Re-run Factor Analysis with the filtered data
-#     fa.fit(X_filtered)
-
-# #    new_loadings = pd.DataFrame(fa.loadings_, index=X_filtered.columns)
+def boxFactorPlot(ax, df, factor, city_col, ylim = [0, 100]):
+    """
+    Creates a box plot for the given factor, with cities on the x-axis.
     
-#     variance_explained = fa.get_factor_variance()
-#     print(f"\nVariance Explained per Factor:\n{variance_explained[1]}")  # Proportion per factor
-#     print(f"Cumulative Variance Explained: {variance_explained[2][-1]:.2f}")  # Should be > 0.60
+    Parameters:
+    df (DataFrame): The dataset containing the factor and city column.
+    factor (str): The column name of the factor to plot.
+    city_col (str): The column name representing the cities.
     
-#     return X_filtered
+    Returns:
+    None (Displays the plot)
+    """
+    plt.figure(figsize=(10, 10), dpi = 500)
+    sorted_cities = sorted(df[city_col].unique())
+    
+    sns.boxplot(x=df[city_col], y=df[factor], order = sorted_cities,
+                color = "#FF632F", ax = ax)
+
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45)  # Rotate city names for better readability
+    ax.set_xlabel("")
+    ax.set_ylim(ylim)
+    ax.set_ylabel(factor.replace("_", " ").title() + " score")
+#    plt.title(f"Box Plot of {factor.replace('_', ' ').title()} by City")
+
+    ax.grid(axis="y", linestyle="--", alpha=0.7)
 
 # %% Import the dataset, specify the target variables
 
@@ -106,17 +104,17 @@ df = fillAssessNans(df, df.columns)
 df = relativeVars(df)
 
 assessCols = ["afford",
-#              "diffperSafeBike", "diffperSafeMoto", 
+              "diffperSafeBike", "diffperSafeMoto", 
               "diffperSafePT", "diffperSafeTaxi", 
-#              "diffperSafeWalk",
+              "diffperSafeWalk",
               "diffpsafeBike", "diffpsafeMoto", "diffpsafeWalk",
-#              "diffpsafePT", "diffpsafeTaxi"
-#              "reliable",
+              "diffpsafePT", "diffpsafeTaxi",
+              "reliable",
               "relpeakBike", 
               "relpeakMoto", 
-#              "relpeakPT", 
+              "relpeakPT", 
               "relpeakTaxi", "relpeakWalk",
-#      "relnonpeakBike", "relnonpeakMoto", "relnonpeakPT", "relnonpeakTaxi", "relnonpeakWalk",
+              "relnonpeakBike", "relnonpeakMoto", "relnonpeakPT", "relnonpeakTaxi", "relnonpeakWalk",
                 "waitBus", 
                 "waitTrain",
               "walkBus", "walkTrain"]
@@ -170,16 +168,27 @@ for i, (ev, var, cum) in enumerate(zip(eigen_values, variance_explained, cumulat
 # %% Run the Factor Analysis
 
 X = df[assessCols]
-nf = 5
+nf = 7
 
 fa = FactorAnalyzer(n_factors = nf, rotation="oblimin")
 fa.fit(X)
+
+
+fa.get_eigenvalues()
+
+eigen_values, vectors = fa.get_eigenvalues()
     
 loadings = pd.DataFrame(fa.loadings_, index=X.columns)
 print(loadings)
 
 communalities = fa.get_communalities()
 print(pd.Series(communalities, index=assessCols))
+
+eigen_values, vectors = fa.get_eigenvalues()
+total_vars = len(assessCols)
+variance_explained = eigen_values / sum(eigen_values) * 100
+cumulative_variance = variance_explained.cumsum()
+
 # %%
 
 # for f in l.columns:  print(l.loc[abs(l[f]) > 0.10])
@@ -191,13 +200,3 @@ factor_scores['pid'] = pid
 df = pd.merge(df, factor_scores, on='pid', how='left')
     
 # df.to_csv(os.path.join(root_dir, "finalDatasets", "SumSurveyAssessV8.csv"))
-
-# %%
-# Select only factor scores
-factor_score_cols = [col for col in df.columns if col.startswith("factor_")]
-
-# Compute correlation matrix
-factor_score_corr = df[factor_score_cols].corr()
-
-print("Correlation matrix of factor scores:")
-print(factor_score_corr)
