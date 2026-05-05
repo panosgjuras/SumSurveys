@@ -13,6 +13,10 @@ import random
 # from sumSurveyMapping import mapping
 import numpy as np
 import re
+import os
+
+# TODO Fix the path here, it is a local one
+path = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData"
 
 def extract_numbers(text):
     if isinstance(text, str):
@@ -71,7 +75,8 @@ def mappingTimes(df, x):
     mapTimes = dict(zip(matched_rows['orig'], matched_rows['meds']))
     return mapTimes
 
-def mapping(df, x, path):
+def mapping(df, x):
+
     os.chdir(os.path.join(path, 'mappings'))
 
     def load_mapping(file_prefix):
