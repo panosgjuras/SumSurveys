@@ -248,7 +248,7 @@ def stacked_ShareDist(df, title):
         ax=ax)
     
     ax.set_title(title)
-    ax.set_xlabel('Distance band (km)')
+    ax.set_xlabel('Trip distance in km')
     ax.set_ylabel('Mode share (%)')
     ax.set_ylim(0, 100)
     ax.legend(title='Transport mode', bbox_to_anchor=(1.02, 1), loc='upper left')
@@ -280,7 +280,7 @@ def stacked_ShareDist(df, title):
     plt.show()
 
 
-remark = 'Rotterdam, Larnca, and Fredrikstad exluded'
+remark = 'Rotterdam, Larnaca, and Fredrikstad exluded'
 stacked_ShareDist(df1, f"Ex-ante mode share ({remark})")
 stacked_ShareDist(df2, f"Ex-post mode share ({remark})")
 
