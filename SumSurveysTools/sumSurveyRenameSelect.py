@@ -120,8 +120,8 @@ def callMatcher(df, city, path):
     # matcher = pd.read_csv(saveColsPath, delimiter=';')
     return matcher
 
-def reNamer(df, city):
-    matcher = callMatcher(df, city)
+def reNamer(df, city, path):
+    matcher = callMatcher(df, city, path)
     # print(matcher)
     # matcher.loc[1, 'name2'] = 'found'
     matcher = matcher[matcher['name2'] != 'NotFound'].reset_index(drop = True)
@@ -129,8 +129,8 @@ def reNamer(df, city):
         df = df.rename(columns = {matcher.loc[i, 'fix']: matcher.loc[i, 'name2']})
     return df
 
-def reSelect(df, city):
-    matcher = callMatcher(df, city)
+def reSelect(df, city, path):
+    matcher = callMatcher(df, city, path)
     select = pd.DataFrame(matcher.name2)
     select = select[select['name2'] != 'NotFound'].reset_index(drop = True)
     mask = df.columns.isin(select['name2'].tolist())
@@ -181,11 +181,11 @@ def callData(city, path, when ="", match = 'yes'):
         # print(df)
     
     if match == 'yes':
-        matcher = callMatcher(df, city)
+        matcher = callMatcher(df, city, path)
         # print(matcher)
-        df = reNamer(df, city)
+        df = reNamer(df, city, path)
         # print(df.head)
-        df = reSelect(df, city)
+        df = reSelect(df, city, path)
         # print(df.head)
         df = droper(df, city)
         

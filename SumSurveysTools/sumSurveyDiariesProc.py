@@ -10,7 +10,7 @@ Research project: SUM
 
 import pandas as pd
 import os
-import googlemaps
+# import googlemaps
 import geopandas as gpd
 from shapely.geometry import Point
 from tqdm import tqdm
@@ -74,102 +74,102 @@ def savelocPoints(df, coords_column, location_column, output_shp_path):
     gdf_subset.to_file(output_shp_path, driver='ESRI Shapefile')
     return gdf
     
-def calculate_distance(orig_lat, orig_lon, dest_lat, dest_lon,
-                       API_KEY = None):
-    """
-    Calculate the distance between two points using Google Maps Distance Matrix API.
+# def calculate_distance(orig_lat, orig_lon, dest_lat, dest_lon,
+#                        API_KEY = None):
+#     """
+#     Calculate the distance between two points using Google Maps Distance Matrix API.
     
-    Args:
-    orig_lat (float): Latitude of the origin.
-    orig_lon (float): Longitude of the origin.
-    dest_lat (float): Latitude of the destination.
-    dest_lon (float): Longitude of the destination.
+#     Args:
+#     orig_lat (float): Latitude of the origin.
+#     orig_lon (float): Longitude of the origin.
+#     dest_lat (float): Latitude of the destination.
+#     dest_lon (float): Longitude of the destination.
     
-    Returns:
-    distance (str): Distance in kilometers or miles.
-    """
-    # Use the Google Maps Distance Matrix API
-    origin = (orig_lat, orig_lon)
-    destination = (dest_lat, dest_lon)
+#     Returns:
+#     distance (str): Distance in kilometers or miles.
+#     """
+#     # Use the Google Maps Distance Matrix API
+#     origin = (orig_lat, orig_lon)
+#     destination = (dest_lat, dest_lon)
     
-    gmaps = googlemaps.Client(key=API_KEY)
+#     gmaps = googlemaps.Client(key=API_KEY)
     
-    # Get the distance
-    result = gmaps.distance_matrix([origin], [destination], mode="driving")  # Mode can be "walking", "bicycling", etc.
+#     # Get the distance
+#     result = gmaps.distance_matrix([origin], [destination], mode="driving")  # Mode can be "walking", "bicycling", etc.
     
-    # Extract the distance from the API response
-    try:
-        distance = result['rows'][0]['elements'][0]['distance']['text']
-        return distance
-    except (IndexError, KeyError):
-        return None  # In case of errors or no distance found
+#     # Extract the distance from the API response
+#     try:
+#         distance = result['rows'][0]['elements'][0]['distance']['text']
+#         return distance
+#     except (IndexError, KeyError):
+#         return None  # In case of errors or no distance found
 
-def convert_to_meters(distance_str):
+# def convert_to_meters(distance_str):
     
-    if distance_str == '1 m': distance_str = '5000 m'  # Replace '1 m' with '5000 m' (5 km)
+#     if distance_str == '1 m': distance_str = '5000 m'  # Replace '1 m' with '5000 m' (5 km)
     
-    # Check if the distance_str is not None and is a string
-    if distance_str and isinstance(distance_str, str):
-        # Check if the string contains 'km' or 'm' and process accordingly
-        if 'km' in distance_str:
-            # Remove 'km' and convert to float, then multiply by 1000 to convert to meters
-            return float(distance_str.replace(' km', ''))
-        elif 'm' in distance_str:
-            # Remove 'm' and convert to float
-            return float(distance_str.replace(' m', ''))/1000
-    return np.nan  # Return np.nan if the input is None or cannot be processed
+#     # Check if the distance_str is not None and is a string
+#     if distance_str and isinstance(distance_str, str):
+#         # Check if the string contains 'km' or 'm' and process accordingly
+#         if 'km' in distance_str:
+#             # Remove 'km' and convert to float, then multiply by 1000 to convert to meters
+#             return float(distance_str.replace(' km', ''))
+#         elif 'm' in distance_str:
+#             # Remove 'm' and convert to float
+#             return float(distance_str.replace(' m', ''))/1000
+#     return np.nan  # Return np.nan if the input is None or cannot be processed
 
-def addTripDist(df, path):
+# def addTripDist(df, path):
     
-    locPointsUpd2 = pd.read_csv(os.path.join(path, "finalDatasets", "locPointsUpd.csv"))
+#     locPointsUpd2 = pd.read_csv(os.path.join(path, "finalDatasets", "locPointsUpd.csv"))
     
-    df["origC"] = df["orig"] + ", " + df["city"]
-    df["destC"] = df["dest"] + ", " + df["city"]
+#     df["origC"] = df["orig"] + ", " + df["city"]
+#     df["destC"] = df["dest"] + ", " + df["city"]
     
-    # Merge for 'origC' and add suffix '_orig' for latitude and longitude columns
-    df = df.merge(
-        locPointsUpd2[['location2', 'latitude', 'longitude']], 
-        left_on='origC', 
-        right_on='location2', 
-        how='left', 
-        suffixes=('', '_orig')  # Add '_orig' to the new columns (latitude, longitude)
-    )
+#     # Merge for 'origC' and add suffix '_orig' for latitude and longitude columns
+#     df = df.merge(
+#         locPointsUpd2[['location2', 'latitude', 'longitude']], 
+#         left_on='origC', 
+#         right_on='location2', 
+#         how='left', 
+#         suffixes=('', '_orig')  # Add '_orig' to the new columns (latitude, longitude)
+#     )
 
-    # Merge for 'destC' and add suffix '_dest' for latitude and longitude columns
-    df = df.merge(
-        locPointsUpd2[['location2', 'latitude', 'longitude']], 
-        left_on='destC', 
-        right_on='location2', 
-        how='left', 
-        suffixes=('', '_dest')  # Add '_dest' to the new columns (latitude, longitude)
-    )
+#     # Merge for 'destC' and add suffix '_dest' for latitude and longitude columns
+#     df = df.merge(
+#         locPointsUpd2[['location2', 'latitude', 'longitude']], 
+#         left_on='destC', 
+#         right_on='location2', 
+#         how='left', 
+#         suffixes=('', '_dest')  # Add '_dest' to the new columns (latitude, longitude)
+#     )
 
-    df = df.drop(columns = ['Unnamed: 0','location2', 'origC', 'destC', 'orig_coords', 'location2_dest'])
+#     df = df.drop(columns = ['Unnamed: 0','location2', 'origC', 'destC', 'orig_coords', 'location2_dest'])
 
-    df.rename(columns={
-        'latitude': 'orig_latitude',
-        'longitude': 'orig_longitude',
-        'latitude_dest': 'dest_latitude',
-        'longitude_dest': 'dest_longitude'
-    }, inplace=True)
+#     df.rename(columns={
+#         'latitude': 'orig_latitude',
+#         'longitude': 'orig_longitude',
+#         'latitude_dest': 'dest_latitude',
+#         'longitude_dest': 'dest_longitude'
+#     }, inplace=True)
 
-    # Initialize tqdm with the DataFrame length
-    tqdm.pandas(desc="Calculating distances")
+#     # Initialize tqdm with the DataFrame length
+#     tqdm.pandas(desc="Calculating distances")
 
-    # Apply the function to your dataframe to calculate the distances for each row
-    # This will also track progress and calculate the percentage of completion
-    df['distance'] = df.progress_apply(lambda row: calculate_distance(row['orig_latitude'], row['orig_longitude'], row['dest_latitude'], row['dest_longitude']), axis=1)
+#     # Apply the function to your dataframe to calculate the distances for each row
+#     # This will also track progress and calculate the percentage of completion
+#     df['distance'] = df.progress_apply(lambda row: calculate_distance(row['orig_latitude'], row['orig_longitude'], row['dest_latitude'], row['dest_longitude']), axis=1)
 
-    # Function to convert distance string to numeric value in meters
+#     # Function to convert distance string to numeric value in meters
 
-    # Apply the function to the 'distance' column
-    df['fdistance'] = df['distance'].apply(convert_to_meters)
+#     # Apply the function to the 'distance' column
+#     df['fdistance'] = df['distance'].apply(convert_to_meters)
 
-    # Replace NaN values with 5 km (5000 meters)
-    df['fdistance'].fillna(5000, inplace=True)
+#     # Replace NaN values with 5 km (5000 meters)
+#     df['fdistance'].fillna(5000, inplace=True)
 
-    # df.to_csv(os.path.join(root_dir, 'SumSurveyDiariesV2.csv'))
-    return df
+#     # df.to_csv(os.path.join(root_dir, 'SumSurveyDiariesV2.csv'))
+#     return df
     
 
 

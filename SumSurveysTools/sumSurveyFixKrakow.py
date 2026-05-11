@@ -40,7 +40,7 @@ def kraDiar(df, kradiar):
     return ndf
 
 def fixKra(df, w, path): 
-    kra = kraDiar(callData('Krakow', when = w)[0][['pid', 'city', 'GlobalID']], 
+    kra = kraDiar(callData('Krakow', path, when = w)[0][['pid', 'city', 'GlobalID']], 
               pd.read_csv(os.path.join(path, 'rawDatasets' , 'Krakow', 'diaryDatasetKra.csv'), delimiter=';'))
     df = pd.concat([df, kra],ignore_index=True).dropna(subset=['mode', 'purp', 'time'])
     # df = df.drop(columns = ['dest'])

@@ -15,12 +15,12 @@ Research project: SUM
 
 root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData" # The path with raw data
 
-import SumSurveysTools
-
-from SumSurveysTools.sumSurveyRenameSelect import callData
+# import SumSurveysTools
+# from SumSurveysTools.sumSurveyRenameSelect import callData
 
 import os
 import pandas as pd
+os.chdir("/Users/panosgtzouras/Desktop/github_tzouras/SumSurveys/SumSurveysTools")
 from sumSurveyRenameSelect import callData, missCols, excludeCity
 from sumSurveyReplacer import rePlacer, newAssessDF, genRandomTime, fill_na_empirical, sociodummies
 from sumAssessAnalysis import (dstatsAssess, heatmapTimeSafe2,
@@ -99,18 +99,22 @@ assess.to_csv(os.path.join(root_dir, 'finalDatasets/"SumSurveyAssessV5.csv'), in
 # %% Step 4: Creation of the Diaries Dataframe
 col3 = ['pid', 'city'] + attr
 diaries = pd.DataFrame(columns = col3)
+path = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData"
 for c in cIE:
     # same process as in assessment dataframe
-    df = callData(c, when = w)[0]
+    df = callData(c, path, when = w)[0]
     df = missCols(df, attr)
     diaries = pd.concat([diaries, df[col3]],ignore_index=True)
 
 diaries = createDiariesDf(diaries) # now write all trips in row, each trip is one row
 # so diaries now is a set of trips
-diaries = fixKra(diaries, w, root_dir) # match the file from Krakow, it has a different format
+diaries = fixKra(diaries, w, path) # match the file from Krakow, it has a different format
 diaries = rePlacer(diaries, 'mode') # replace the transport modes based on the mappings
 diaries = rePlacer(diaries, 'purp') # replace the trip purposes based on the mappings
 diaries['time'] =  diaries['time'].apply(genRandomTime) # generate travel times and other
+
+
+
 
 # %% Step 5: Paper32 - SumSurvey first analyis
 

@@ -186,3 +186,82 @@ locations = manual_coords_update(locations, updates)
 # save a new version and inspect again on GIS
 version = "_v3"
 make_gpkg(locations, version)
+
+# %%
+
+df = pd.read_csv(os.path.join("/Users/panosgtzouras/Desktop", 'munich_geneva_problem.csv'))
+
+locations = sum_geocoding(df) # DO NOT RUN IT AGAIN
+
+failed = failed_geocode(locations)
+manual_coords = {
+        'Zone M (Innenstadt), Munich': (48.1402, 11.5586),
+        'Zone 1, Munich':  (48.1816, 11.5060),
+        'Zone 2, Munich': (48.2807, 11.5785),
+        'Zone 3, Munich': (48.3146, 11.6638),
+        'Zone 4, Munich': (48.3962, 11.7480),
+        'Zone 5, Munich': (48.3538, 11.7861),
+        'Zone 6, Munich': (48.4706, 11.9385)}
+
+
+locations[['lat', 'lon']] = locations.apply(
+    fill_manual_coords,
+    axis=1
+)
+
+drop_locations = ["nan, Geneva"]
+locations = locations[ ~locations['location'].isin(drop_locations)].copy()
+
+
+version = "_v1.3"
+make_gpkg(locations, version)
+
+# %%
+
+
+# %%
+centroids2 = gpd.read_file(os.path.join(root_dir, "geocoded_locations_v1.2.gpkg"), layer = 'locations')
+
+drop_locations = ["nan, Geneva"]
+
+centroids2 = centroids2[~centroids2['location'].isin(drop_locations)].copy()
+
+centroids2.to_file(os.path.join(root_dir, "geocoded_locations_v1.3.gpkg",),layer='locations', driver='GPKG')
+# %%
+
+
+def merge_geocoded_layers(root_dir, gpkg1, gpkg2, output_name, 
+                          layer='locations', drop_duplicates=True):
+
+    # Read layers
+    centroids1 = gpd.read_file(os.path.join(root_dir, gpkg1), layer=layer)
+
+    centroids2 = gpd.read_file(os.path.join(root_dir, gpkg2),layer=layer)
+
+    # Merge
+    merged = pd.concat([centroids1, centroids2],ignore_index=True)
+
+    # Convert back to GeoDataFrame
+    merged = gpd.GeoDataFrame(merged,geometry='geometry', crs=centroids1.crs)
+
+    # Remove duplicates
+    if drop_duplicates:
+        merged = merged.drop_duplicates(
+            subset='location'
+        ).copy()
+
+    # Save
+    merged.to_file(os.path.join(root_dir, output_name),layer=layer, driver='GPKG')
+
+    print(f"Merged layer saved: {output_name}")
+    print(f"Total locations: {len(merged)}")
+
+    return merged
+
+
+centroids = merge_geocoded_layers(
+    root_dir=root_dir,
+    gpkg1="geocoded_locations_v3.gpkg",
+    gpkg2="geocoded_locations_v1.3.gpkg",
+    output_name="geocoded_locations_v5.gpkg"
+)
