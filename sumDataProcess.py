@@ -38,6 +38,13 @@ root_dir = "/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData/finalDataset
 # _v1.0.1 ex-ante
 # _v1.0.2 ex-post, but no information for income is provided
 
+# %%
+version = "_v3.0.1"
+df =  pd.read_csv(os.path.join(root_dir, f"SumSurveyDiaries{version}.csv"))
+
+# df = df.drop(columns = ['distance'])
+version = "_v2.0.1"
+df.to_csv(os.path.join(root_dir, f"SumSurveyDiaries{version}.csv"), index = False)
 
 # %% New Functions
 
@@ -216,4 +223,82 @@ df1 = pd.concat([df1, diaries], ignore_index=True) # append the new estimated di
 version = "_v3.0.1"
 df1.copy().to_csv(os.path.join(root_dir, f"SumSurveyDiaries{version}.csv"), index=False)
 
+# %% Add income
 
+link = "/Users/panosgtzouras/Library/CloudStorage/OneDrive-UniversityofWestAttica/TZOURAS_paperz/paper49_sumImpact/ex_ante_dataset/SumSurveyDiaries_FINAL_with_Demographics_InclIncome.csv"
+
+ad = pd.read_csv(link)
+
+ad = ad.loc[ad['survey_type'] == 'ExPost']
+ad = ad.drop_duplicates('pid')
+ad = ad[['pid', 'Income']].rename(columns = {'Income': 'income'})
+
+v = "_v1.0.2"
+df2 = pd.read_csv(os.path.join(root_dir, f"SumSurveySocio{v}.csv"))
+df2 = df2.drop(columns = ['income'])
+# Merge
+
+df2 = df2.merge(
+
+    ad,
+
+    on='pid',
+
+    how='left'
+
+)
+
+df2 = df2.dropna(
+    subset=['gender', 'age', 'educ', 'employ', 'income']
+).copy()
+
+version = "_v1.0.2"
+df2.copy().to_csv(
+    os.path.join(root_dir, f"SumSurveySocio{version}.csv"),
+    index=False
+) # this dataset is the same with V1 but it is the ex-post
+
+# %% Create a common dataset to run LCCA
+
+v = "v1"
+df1 = pd.read_csv(os.path.join(root_dir, f"SumSurveySocio{v}.csv"))
+df1['npid'] = 'a' + df1['pid'].astype(str)
+
+v = "_v1.0.2"
+df2 = pd.read_csv(os.path.join(root_dir, f"SumSurveySocio{v}.csv"))
+df2['npid'] = 'b' + df2['pid'].astype(str)
+df = pd.concat([df1, df2], ignore_index = True)
+
+version = "_v4.0"
+df.copy().to_csv(
+    os.path.join(root_dir, f"SumSurveySocio{version}.csv"),
+    index=False
+) # this dataset is the same with V1 but it is the ex-post
+
+# %% Add class in both sets
+
+v = "_v5.0"
+
+df = pd.read_csv(
+    os.path.join(root_dir, f"SumSurveySocio{v}.csv")
+)
+
+# pid starts with 'a'
+df1 = df[df['npid'].astype(str).str.startswith('a')].copy()
+df1 = df1.drop(columns = ['npid'])
+
+# pid starts with 'b'
+df2 = df[df['npid'].astype(str).str.startswith('b')].copy()
+df2 = df2.drop(columns = ['npid'])
+
+version = "_v2.0.1"
+df1.copy().to_csv(
+    os.path.join(root_dir, f"SumSurveySocio{version}.csv"),
+    index=False
+) # this dataset is the same with V1 but it is the ex-post
+
+version = "_v2.0.2"
+df2.copy().to_csv(
+    os.path.join(root_dir, f"SumSurveySocio{version}.csv"),
+    index=False
+) # this dataset is the same with V1 but it is the ex-post

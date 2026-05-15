@@ -142,7 +142,7 @@ def heatmapTimeSafe(data, city, custom_yticks = [7.5, 22.5, 37.5, 52.5, 67.5, 82
     plt.tight_layout()
     plt.show()
         
-def plotModalSplit3(dataframe, city, angel = 60):
+def plotModalSplit3(dataframe, city, angel = 60, period = None):
     """
     Plots a pie chart without labels for slices less than 1%, and with percentage annotations for slices greater than 1%.
     """
@@ -192,9 +192,12 @@ def plotModalSplit3(dataframe, city, angel = 60):
             ax.annotate(mode_counts.index[i], xy=(x, y), xytext=(1.2*np.sign(x), 1.2*y),
                        horizontalalignment=horizontalalignment,
                        arrowprops=dict(arrowstyle="->", connectionstyle=connectionstyle, color='black'))
+    
+    if period is not None: title = f"{period} modal split in {city}"
+    else: title = f"Modal split in {city}"
 
     ax.axis('equal')
-    plt.title(f"Modal split in {city}")
+    plt.title(title)
     plt.show()
 
 

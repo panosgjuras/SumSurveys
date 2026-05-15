@@ -73,7 +73,7 @@ defineClustersNumber <- function(df, formula, totaL_classes, maxiter = 10000) {
   return(p)
 }
 
-csv_link = '/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData/finalDatasets/SumSurveySocioV1.csv'
+csv_link = '/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData/finalDatasets/SumSurveySocio_v4.0.csv'
 df = read.csv(csv_link)
 
 # exclude = c("pid", "gender", "age", "educ", "employ")
@@ -172,5 +172,18 @@ defineClustersNumber2 <- function(df, formula, totaL_classes, maxiter = 10000) {
 }
 
 defineClustersNumber2(df, formula, 10, maxiter = 10000)
+
+lca_model <- poLCA(formula, df, nclass = 4, maxiter = 10000, graphs = TRUE,
+                   nrep = 10)
+
+# Summary of the LCA model
+summary(lca_model)
+
+table(lca_model$predclass)
+lca_model$probs
+df$class <- lca_model$predclass
+
+output_csv_link = '/Users/panosgtzouras/Desktop/datasets/csv/SUMsurveyData/finalDatasets/SumSurveySocio_v5.0.csv'
+write.csv(df, output_csv_link, row.names = FALSE)  # Save the dataframe without row names
 
 

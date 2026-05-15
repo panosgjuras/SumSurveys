@@ -73,7 +73,7 @@ socio = pd.DataFrame(columns = col2)
 
 for c in cIE:
     # Call the data and rename the target columns; only variables included in the matching file
-    df = callData(c, when = w)[0]
+    df = callData(c, root_dir, when = w)[0]
     # if any column is missing, add it with nans
     df = missCols(df, sele + char)
     # create a general dataframe with all the cities
